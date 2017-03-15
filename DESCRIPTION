@@ -6,8 +6,9 @@ Authors@R: person("Tobias", "Muetze", email = "tobias.muetze@outlook.com",
   role = c("aut", "cre"))
 Description: A collection of functions allowing to perform a random-effects meta-analysis for variances, approximate the MAP prior by a mixture of gamma distributions, plan a new study based on the MAP prior, and update the MAP prior after an internal pilot study.
 License: GPL-3
-Imports: rjags
+Imports: rjags, stats
 SystemRequirements: JAGS >= 4.1.0
+Depends: R (>= 2.10)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
