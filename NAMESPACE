@@ -2,6 +2,8 @@
 
 export(dmixinvgamma)
 export(fit_gammamix)
+export(n_ttest)
+export(power_ttest)
 export(qmixinvgamma)
 export(varmeta)
 import(rjags)
