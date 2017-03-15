@@ -2,7 +2,7 @@
 % Please edit documentation in R/qmixinvgamma.R
 \name{qmixinvgamma}
 \alias{qmixinvgamma}
-\title{qmixinvgamma}
+\title{The mixture of inverse gamma distributions}
 \usage{
 qmixinvgamma(p, w, shape, rate)
 }

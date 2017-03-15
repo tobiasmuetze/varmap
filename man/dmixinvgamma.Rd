@@ -2,7 +2,7 @@
 % Please edit documentation in R/dmixinvgamma.R
 \name{dmixinvgamma}
 \alias{dmixinvgamma}
-\title{dmixinvgamma}
+\title{The mixture of inverse gamma distributions}
 \usage{
 dmixinvgamma(x, w, shape, rate)
 }

@@ -1,4 +1,4 @@
-#' qmixinvgamma
+#' @title The mixture of inverse gamma distributions
 #' @description Quantiles of a mixture of invserse gamma distributions
 #' @param p vector of probabilities
 #' @param w weights which sum up to one
