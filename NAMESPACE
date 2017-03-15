@@ -2,6 +2,7 @@
 
 export(dmixinvgamma)
 export(fit_gammamix)
+export(qmixinvgamma)
 export(varmeta)
 import(rjags)
 import(stats)
