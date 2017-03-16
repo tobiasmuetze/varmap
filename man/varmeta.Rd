@@ -4,16 +4,13 @@
 \alias{varmeta}
 \title{MAP approach for variances}
 \usage{
-varmeta(sample_var, degf, tau_sd, mu_mean, n.iter = 10000, ...)
+varmeta(sample_var, degf, mu_mean, n.iter = 10000, ...)
 }
 \arguments{
 \item{sample_var}{numeric vector with the sample variances from historical
 clinical trials}
 
 \item{degf}{numeric vector with the degrees of freedom of the sample variances}
-
-\item{tau_sd}{standard deviation parameter of the half-normal prior for the
-between-study variability}
 
 \item{mu_mean}{mean of the normal prior for the mean}
 

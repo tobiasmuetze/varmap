@@ -8,8 +8,6 @@
 #' @param sample_var numeric vector with the sample variances from historical
 #' clinical trials
 #' @param degf numeric vector with the degrees of freedom of the sample variances
-#' @param tau_sd standard deviation parameter of the half-normal prior for the
-#' between-study variability
 #' @param mu_mean mean of the normal prior for the mean
 #' @param n.iter number of iterations to monitor in the R function \code{coda.samples}
 #' @param ... Additional arguments for the R functions \code{coda.samples} and
@@ -23,14 +21,13 @@
 #' Computational Statistics & Data Analysis (2016).
 #' @import stats rjags
 #' @export
-varmeta <- function(sample_var, degf, tau_sd, mu_mean, n.iter = 10000, ...) {
+varmeta <- function(sample_var, degf, mu_mean, n.iter = 10000, ...) {
 
   # Additional arguments
   add_args <- list(...)
   if (is.null(n.chains <- add_args$n.chains)) n.chains <- 1
   if (is.null(n.adapt <- add_args$n.adapt)) n.adapt <- 1000
   if (is.null(quiet <- add_args$quiet)) quiet <- FALSE
-  if (tau_sd <= 0) stop("tau_sd must be positive")
 
   # meta-analytic-predictive (MAP) jags code
   modelstring_1 <- "
@@ -43,16 +40,15 @@ varmeta <- function(sample_var, degf, tau_sd, mu_mean, n.iter = 10000, ...) {
       theta[j] ~ dnorm(mu, inv_tau2)
     }
 
-    tau ~ dnorm(0, 1/"
-  modelstring_2 <-  ")I(0,)
+    tau ~ dnorm(0, 1/0.5)I(0,)
     inv_tau2 <- pow(tau,-2)
     mu ~ dnorm("
-  modelstring_3 <- ", 0.0001)
+  modelstring_2 <- ", 0.0001)
     theta_pred ~ dnorm(mu, inv_tau2)
     map_variance <- exp(theta_pred)
   }"
 
-  modelstring <- paste0(modelstring_1, tau_sd, modelstring_2, mu_mean, modelstring_3)
+  modelstring <- paste0(modelstring_1,mu_mean, modelstring_2)
 
   # MAP analysis for variances
   model_spec <- textConnection(modelstring)
