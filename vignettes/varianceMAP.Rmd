@@ -1,0 +1,193 @@
+---
+title: "<center>Meta-analytic-predictive approach for variances</center>"
+author: "<center>Tobias Mütze</center>"
+date: "<center> `r Sys.Date()` </center>"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    theme: paper
+vignette: >
+  %\VignetteIndexEntry{MAP approach for variances}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+<style type="text/css">
+  h1 { 
+   font-size: 20px;
+  }
+  h2 { 
+   font-size: 17px;
+  }
+</style>
+
+
+
+---
+  
+  The package `varmap` provides functions for the meta-analytic-predictive (MAP) approach for variances of a normally distributed endpoint.
+  In detail, the package `varmap` includes a function for a random-effects meta-analysis of historical variances using Bayesian hierarchical model which then also generates random number from the MAP prior of the variance of a new clinical trials. 
+  To approximate the MAP prior of the variance by a mixture of conjugate priors, a function fitting to EM algorithm to a sample is included.
+  More information on the MAP approach itself can be found in Neuenschwander et al. (2010) and in Schmidli et al. (2014). 
+  The MAP approach for variances was introduced by Schmidli et al. (2016). 
+  This document provides a worked-out example for applying the MAP approach for variances.
+
+---
+
+
+# Brief introduction into the MAP approach for variances
+
+  In the following a brief introduction into the MAP approach for variances is given. 
+  A similar introduction is also given by Mütze et al. (2017).
+  We denote the sample variances observed in historical clinical trials by $\hat{\sigma}^2_{j}$, $j=1,\ldots, J$. 
+  The respective degrees of freedom observed in trial $j$ is denoted by $\nu_j$. 
+  Moreover, let $\sigma_{j}^{2}$ be the unknown true variance in the historical trial $j=1,\ldots, J$. 
+  The assumption that the endpoint of interest in the historical clinical trials follows normal distribution motivates our choice to model the sample variance   $\hat{\sigma}^2_{j}$ as a strechted $\chi^2$-distribution, i.e. 
+  \begin{align*}
+  \frac{\nu_j}{\sigma_j^2}\hat{\sigma}_{j}^{2} \Big| \sigma_j^2 \sim \chi_{\nu_j}^2.
+  \end{align*}
+  This stretched $\chi^2$-distribution can also be written a Gamma distribution
+  \begin{align*}
+  \hat{\sigma}^2_{j} \big| \sigma_j^2 \sim  
+  \operatorname{Gamma}\left(0.5\nu_j, 0.5\frac{\nu_j}{\sigma_j^2} \right).
+  \end{align*}
+  Here, we choose the parametrization of a Gamma distribution with shape parameter $a$ and rate parameter $b$, $\operatorname{Gamma}(a,b)$, such that the mean and the variance are given by $a/b$ and $a/b^2$, respectively.
+  To goal is to obtain a MAP prior for the variance $\sigma^2_{new}$ of a to be planned clinical trial based on the variances observed in the historical clinical trials, that is the distribution 
+  \begin{align*}
+  \sigma^{2}_{new} | \hat{\sigma}^2_{1}, \ldots, \hat{\sigma}^2_{J}.
+  \end{align*}
+  Thereto, a random effect meta-analysis using a Bayesian hierarchical model will be performed.
+  We assume that the variance of the new clinical trial and the true unkown variance of the historical clinical trials follow the same distribution.
+  Let the log-transformed variances $\theta_{new}=\log(\sigma^2_{new}), \theta_{1}=\log(\sigma^2_{1}), \ldots, \theta_{J}=\log(\sigma^2_{J})$ follow a normal distribution, that is
+  \begin{align*}
+  \theta_{new}, \theta_{1}, \ldots, \theta_{J} \sim 
+  \mathcal{N}\left(\mu, \tau^2\right).
+  \end{align*}
+  As prior distributions for the mean $\mu$ are normal distribution is recommended,
+  \begin{align*}
+  \mu \sim \mathcal{N}(\lambda, \sigma_{\mu}^2).
+  \end{align*}
+  A half-normal distribution has been recommended for the between-trial standad deviation $\tau$,
+  \begin{align*}
+  \tau \sim \mathcal{N}_{+}(0, \kappa^2).
+  \end{align*}
+  The posterior density $p(\mu,\tau,\theta_{new}|\hat{\sigma}_{1}^{2}, \ldots, \hat{\sigma}_{J}^{2})$ has not closed form expression but respective random number can be obtained by Markov chain Monte Carlo (MCMC) computations. 
+  By transforming the random numbers of the log-variance $\theta_{new}$, a random sample for the posterior predictive distribution, which is referred to as MAP prior, of the variance $\sigma^{2}_{new}$ can be obtained.
+  
+## Approximating the MAP prior
+  
+  For theoretical considerations an analytical expression of the MAP prior is generally preferred over a random sample. 
+  As shown by Dalal et al. (1983), prior distributions can be approximated by mixtures of conjugate priors. 
+  For this purpose, the R package `varmap` contains the function `fit_gammamix` which fits a mixture of Gamma distribution to a sample using the EM algorithm proposed by Almhana et al. (2006).
+  However, for a normal likelihood, the Gamma distribution is not a conjugate prior for the variance $\sigma^2$ but for the precision $\omega = 1/\sigma^2$.
+  Let $L$ be the number of mixture components used when fitting the mixture of Gamma distribution
+  \begin{align*}
+  \sum_{l=1}^{L}w_{l}\operatorname{Gamma}(a_{l}, b_{l}).
+  \end{align*}
+  to the MAP prior for the precision $\omega$.
+  The variance is the reciprocal of the precision and the reciprocal of a mixture of Gamma distribution follows a mixture of inverse Gamma distributions.
+  Thus, the MAP prior for the variance $\sigma^2$ can be approximated by mixture of inverse Gamma distributions with the weights $w_l$, shape parameters $a_l$, and rate parameters $b_l$. 
+  The inverse Gamma distribution  $\operatorname{InvGamma}(a,b)$ is parameterized such that mean and variance are given by $b/(a-1)$ and variance $b^2/((a-1)^2(a-2))$.\
+
+
+# Example
+
+## The dataset
+
+  In the following we walk through an example about the MAP approach for variances.
+  The R package `varmap` contains two datasets: `varianceHAMD` and `varianceSPB`. 
+  Both datasets were also discussed by Mütze et al. (2017).
+  Here, we focus on the dataset `varianceSPB` which contains the pooled sample variance and the respective degrees of freedom for twelve historical clinical trials.
+  
+  
+```{r, results = 'asis', echo = TRUE}
+library(varmap)
+data(varianceSPB)
+```
+
+```{r, results = 'asis', echo = TRUE}
+knitr::kable(varianceSPB, caption = "Sample variance of historical clinical trials", row.names = TRUE)
+```
+  
+## Meta-analysis for variances
+
+  A random effects meta-analysis as described in the previous section can be performed using the function `varmeta`.
+  Within the function `varmeta`, the variance of the half-normal prior of $\tau$ is prespecified to be $\kappa^2=0.5$ as recommended by Schmidli et al. (2016).
+  The variance of the normal prior of $\mu$ is prespecified to be $\sigma^2_{\mu}=0.0001$, resulting in a vague prior.
+  The mean $\lambda$ can be specified through the argument `mu_mean` when calling the function `varmeta`.
+  Other arguments include the number of iterations to monitor (`n.iter`) in the MCMC algorithm. 
+  Further optional arguments to be passed to the functions `rjags::coda.samples` and `rjags::jags.model` can be passed, too.
+  The next chunk lists a call of the `varmeta` function.
+
+```{r, results = 'hide', echo = TRUE}
+out <- varmeta(sample_var = varianceHAMD$sample_var, degf = varianceHAMD$degf, mu_mean = 3, n.iter = 1000)
+```
+  
+  The function `varmeta` returns an `mcmc.list` object with the MAP prior of the variance $\sigma^2_{new}$ stored under the name `map_variance`.
+  A histogram of the random samples for the MAP prior of the variance are shown in the next figure.
+  
+```{r, results = 'hide', echo = FALSE, warning=FALSE}
+library(ggplot2)
+map_variance <- out[[1]][, "map_variance"]
+
+map_df <- data.frame(map = as.vector(map_variance))
+p <- ggplot(data = map_df, aes(x = map)) +
+  geom_histogram(aes(y = ..density..), binwidth = 4, colour="black", fill="white") +
+  xlim(c(0, 100)) +
+  xlab(expression(paste("Variance ", hat(sigma)[new]^{2}, " of new trial"))) +
+  ylab("Density") +
+  theme_bw() +
+  theme(legend.key = element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        strip.text.x = element_text(size = 14),
+        strip.text.y = element_text(size = 14),
+        text = element_text(size = 13),
+        legend.text=element_text(size = 14))
+
+```
+
+```{r, fig.width=4, fig.height=4, fig.align="center", warning=FALSE, echo=FALSE, fig.cap="Histogram of MAP prior for variance"}
+p
+```
+
+
+## Approximation by a mixture of conjugate priors
+
+  As mentioned above, working with a set of random numbers from the MAP prior for the variance $\sigma^2_{new}$ is often not handy in practice.
+  However, prior distributions can be approximated by mixtures of conjugate priors. 
+  Here, the focus is on approximating the prior for the precision $\omega = 1/\sigma^2$ from which an approximation of the prior for the variance $\sigma^2$ is obtained.
+  The conjugate prior for the precision is a Gamma distribution.
+  Therefore, the R package `varmap` contains the function `fit_gammamix` which fits a mixture of Gamma distributions to a data set.
+  The function `fit_gammamix` has four arguments. The argument `x` must be the vector containing the sample to which the mixture of Gamma distributions is fitted and `k` determines the number of mixture components. 
+  The maximum number of iterations, which has a default value of 2500, can be set through the argument `max_iter` and the stopping criteria, which defaults to $10^{-4}$, can be changed using the argument `tol`. 
+  The next chunk shows how a mixture of Gamma distributions is fitted to the MAP prior of the precision and the respective output.
+  
+```{r}
+fit_out <- fit_gammamix(x = 1/map_variance, k = 2)
+fit_out
+```
+
+  The function `fit_gammamix` returns a list with the weights, the rate parameters, and the shape parameters of the mixture of Gamma distributions. 
+  The output list also contains the value of the log-likelihood function for estimated parameters and the iteration count at which the algorithm converged.
+  The next figure shows the histogram of the random number from the MAP prior as well as the estimated density of the mixture of Gamma distributions.
+
+```{r, fig.width=4, fig.height=4, fig.align="center", warning=FALSE, echo=FALSE}
+p + stat_function(fun = dmixinvgamma, args = fit_out[c("w", "shape", "rate")], size = 0.8)
+```
+  
+  As it can be seen in the last figure, the fitted mixture distributon describes the random sample well. 
+  A less heuristical approach to assessing the fit, in particular with respect to the number of mixture components, is to compare the AIC for various fits. 
+  
+
+# References
+
+
+
+* Almhana J, Liu Z, Choulakian V, McGorman R. A recursive algorithm for gamma mixture models. IEEE International Conference on Communications. 2006 1:197-202.
+* Dalal SR, Hall WJ. Approximating priors by mixtures of natural conjugate priors. Journal of the Royal Statistical Society. Series B (Methodological). 1983 1:278-286.
+* Neuenschwander B, Capkun-Niggli G, Branson M, Spiegelhalter DJ. Summarizing historical information on controls in clinical trials. Clinical Trials. 2010 7:5-18.
+* Schmidli H, Gsteiger S, Roychoudhury S, O'Hagan A, Spiegelhalter D, Neuenschwander B. Robust meta‐analytic‐predictive priors in clinical trials with historical control information. Biometrics. 2014 70:1023-1032.
+* Schmidli H, Neuenschwander B, Friede T. Meta-analytic-predictive use of historical variance data for the design and analysis of clinical trials. Computational Statistics & Data Analysis. 2016.
+* Mütze T, Schmidli H, Friede T. Nuisance parameter based sample size re-estimation incorporating prior information. Submitted. 2017.
