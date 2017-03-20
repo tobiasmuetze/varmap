@@ -1,0 +1,33 @@
+citHeader("To cite the work on MAP prior for variances in publications, please use the first of the listed references. To cite the work on sample size re-estimation incorporating prior information in publications, please use the second reference.")
+
+	
+citEntry(entry = "Article",
+  title        = "Meta-analytic-predictive use of historical variance data for the design and analysis of clinical trials",
+  author       = personList(as.person("Heinz Schmidli"),
+                   as.person("Beat Neuenschwander"),
+                   as.person("Tim Friede")),
+  journal      = "Computational Statistics & Data Analysis",
+  year         = "2016",
+  url          = "",
+  textVersion  =
+  paste("Schmidli H, Neuenschwander B, Friede T (2016).",
+        "Meta-analytic-predictive use of historical variance data for the design and analysis of clinical trials.",
+        "Computational Statistics & Data Analysis",
+        "URL http://www.sciencedirect.com/science/article/pii/S0167947316301888/.")
+)
+
+citEntry(entry = "Article",
+  title        = "Meta-analytic-predictive use of historical variance data for the design and analysis of clinical trials",
+  author       = personList(as.person("Heinz Schmidli"),
+                   as.person("Beat Neuenschwander"),
+                   as.person("Tim Friede")),
+  journal      = "Submitted",
+  year         = "2017",
+  url          = "",
+  textVersion  =
+  paste("Mütze T, Schmidli H, Friede T (2017).",
+        "Nuisance parameter based sample size re-estimation incorporating prior information.",
+        "Submitted",
+        "URL xxx")
+)
+

@@ -1,2 +1,5 @@
 ^.*\.Rproj$
+^.*\.git$
 ^\.Rproj\.user$
+.travis.yml
+^cran-comments\.md$
