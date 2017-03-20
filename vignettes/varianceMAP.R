@@ -6,7 +6,7 @@ data(varianceSPB)
 knitr::kable(varianceSPB, caption = "Sample variance of historical clinical trials", row.names = TRUE)
 
 ## ---- results = 'hide', echo = TRUE--------------------------------------
-out <- varmeta(sample_var = varianceHAMD$sample_var, degf = varianceHAMD$degf, mu_mean = 3, n.iter = 10000)
+out <- varmeta(sample_var = varianceHAMD$sample_var, degf = varianceHAMD$degf, mu_mean = 3, n.iter = 1000)
 
 ## ---- results = 'hide', echo = FALSE, warning=FALSE----------------------
 library(ggplot2)

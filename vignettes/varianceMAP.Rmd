@@ -89,10 +89,11 @@ vignette: >
   to the MAP prior for the precision $\omega$.
   The variance is the reciprocal of the precision and the reciprocal of a mixture of Gamma distribution follows a mixture of inverse Gamma distributions.
   Thus, the MAP prior for the variance $\sigma^2$ can be approximated by mixture of inverse Gamma distributions with the weights $w_l$, shape parameters $a_l$, and rate parameters $b_l$. 
-  The inverse Gamma distribution  $\operatorname{InvGamma}(a,b)$ is parameterized such that mean and variance are given by $b/(a-1)$ and variance $b^2/((a-1)^2(a-2))$.\
-
+  The inverse Gamma distribution  $\operatorname{InvGamma}(a,b)$ is parameterized such that mean and variance are given by $b/(a-1)$ and variance $b^2/((a-1)^2(a-2))$.
 
 # Example
+
+
 
 ## The dataset
 
@@ -183,11 +184,9 @@ p + stat_function(fun = dmixinvgamma, args = fit_out[c("w", "shape", "rate")], s
 
 # References
 
-
-
 * Almhana J, Liu Z, Choulakian V, McGorman R. A recursive algorithm for gamma mixture models. IEEE International Conference on Communications. 2006 1:197-202.
 * Dalal SR, Hall WJ. Approximating priors by mixtures of natural conjugate priors. Journal of the Royal Statistical Society. Series B (Methodological). 1983 1:278-286.
 * Neuenschwander B, Capkun-Niggli G, Branson M, Spiegelhalter DJ. Summarizing historical information on controls in clinical trials. Clinical Trials. 2010 7:5-18.
 * Schmidli H, Gsteiger S, Roychoudhury S, O'Hagan A, Spiegelhalter D, Neuenschwander B. Robust meta‐analytic‐predictive priors in clinical trials with historical control information. Biometrics. 2014 70:1023-1032.
-* Schmidli H, Neuenschwander B, Friede T. Meta-analytic-predictive use of historical variance data for the design and analysis of clinical trials. Computational Statistics & Data Analysis. 2016.
+* Schmidli H, Neuenschwander B, Friede T. [Meta-analytic-predictive use of historical variance data for the design and analysis of clinical trials](http://www.sciencedirect.com/science/article/pii/S0167947316301888). Computational Statistics & Data Analysis. 2016. 
 * Mütze T, Schmidli H, Friede T. Nuisance parameter based sample size re-estimation incorporating prior information. Submitted. 2017.

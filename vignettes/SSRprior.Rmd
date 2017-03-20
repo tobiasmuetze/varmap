@@ -1,0 +1,158 @@
+---
+title: "<center>Nuisance parameter based sample size re-estimation incorporating prior information</center>"
+author: "<center>Tobias Mütze</center>"
+date: "<center> `r Sys.Date()` </center>"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    theme: paper
+vignette: >
+  %\VignetteIndexEntry{Sample size re-estimation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+<style type="text/css">
+  h1 { 
+   font-size: 20px;
+  }
+  h2 { 
+   font-size: 17px;
+  }
+</style>
+
+
+
+---
+  
+  The package `varmap` provides functions for incorporating prior information into the nuisance parameter based sample size re-estimation in two-arm parallel group superiority trials as it has been discussed in detail by Mütze et al. (2017). 
+  This document provides a worked-out example for nuisance parameter based sample size re-estimation in the case of a normally distributed endpoint.
+
+---
+
+# Introduction
+
+  In the following we introduce the statistical model as well as the general idea for incorporating prior information into the nuisance parameter based sample size re-estimation procedure in clinical trials with internal pilot study.
+    We consider a two-arm parallel group superiority trial with a normally distributed endpoint.
+  More precisely, let $X_{ij}$, $j=1,\ldots,n_i$, $i=T,C$, be independently normally distributed with group mean $\mu_i$ and variance $\sigma^2$, i.e.
+  \begin{align*}
+  X_{ij}|\mu_{i}, \sigma^2 \sim \mathcal{N}\left(\mu_i, \sigma^2 \right).
+  \end{align*}
+  Moreover, it is assumed that the clinical trial is planned and analyzed using frequentist methods.
+  The hypothesis of interest is the superiority of the (T)reatment over (C)ontrol which can be written as  
+  \begin{align*}
+  H_{0}: \mu_T \leq \mu_C \qquad \text{vs.} \qquad H_{1}: \mu_T > \mu_C.
+  \end{align*}
+  The most common frequentist approach to test the null hypothesis $H_0$ is a one-sided two-sample Student's t-test.
+  The total sample size $n$ of the respective clinical trial which aims to assess the null hypothesis $H_0$ which a power of $1-\beta$ can be approximated by
+  \begin{align*}
+  n=4\frac{(q_{\alpha} + q_{\beta})^2}{\delta^2\sigma^2}
+  \end{align*}
+  under the assumption of equal sample sizes within the groups.
+  Here, $\delta$ is the assumed treatment effect under the alternative and $q_p$ is the $p\%$-quantile of a standard normal distribution.
+  In nuisance parameter based sample size re-estimation in clinical trials with internal pilot study, the preplanned sample size of the clinical trial is adjusted mid-course using an estimated of variance $\sigma^2$ obtained with the results from the internal pilot study.
+  To incorporate prior data about the variance into the sample size re-estimation, the prior information is updated after the internal pilot study. 
+  Then, a Bayes estimator for the variance $\sigma^2$ is calculated from the posterior distribution.
+  The Bayes estimator is then plugged into the sample size formula.
+  When updating the prior information about the variance the $n_1$ observations from the internal pilot study are unblinded and assumed to be normally distributed as introduced above.
+  Let $p(\mu_T, \mu_C, \omega)$ be the prior density of the means $\mu_T, \mu_C$ and the precision $\omega$.
+  Additionally, the group means from the internal pilot study are given by $\bar{X}_{1T}$ and $\bar{X}_{1C}$ and the pooled variance estimator is denoted by $\hat{\sigma}^2_{1,pool}$.
+  For the posterior hold
+  \begin{align*}
+  p\left(\mu_T, \mu_C, \omega|\bar{X}_{1T}, \bar{X}_{1C}, \hat{\sigma}^2_{1,pool}\right) \propto p\left(\bar{X}_{1T}, \bar{X}_{1C}, \hat{\sigma}^2_{1,pool}|\mu_T, \mu_C, \omega\right) p(\mu_T, \mu_C, \omega).
+  \end{align*}
+  Furthermore, the prior of the means is an improper uniform prior.
+  The prior of the means is a-prior independent of the prior for the precision which is a mixture of Gamma distributions.
+  Thus it hold
+  \begin{align*}
+  p(\mu_T, \mu_C) = p(\mu_T) p(\mu_C) = 1,\\
+  p(\mu_T, \mu_C, \omega) = p(\mu_T, \mu_C) p(\omega).
+  \end{align*}
+  Since the mixture of Gamma distributions is a conjugate prior for the precision, the posterior follows a mixture of Gamma distributions, too.
+  To re-estimate the sample size under consideration of prior information, a Bayes estimator such as the posterior mean or the posterior median are plugged in to the sample size formula.
+  For more details, see Mütze et al. (2017).
+
+<!--
+# Nuisance parameter based sample size re-estimation
+
+  We consider a two-arm parallel group superiority trial with a normally distributed endpoint.
+  More precisely, let $X_{ij}$, $j=1,\ldots,n_i$, $i=T,C$, be independently normally distributed with group mean $\mu_i$ and variance $\sigma^2$, i.e.
+  \begin{align*}
+  X_{ij}|\mu_{i}, \sigma^2 \sim \mathcal{N}\left(\mu_i, \sigma^2 \right).
+  \end{align*}
+  The hypothesis of interest is the superiority of the (T)reatment over (C)ontril which can be written as  
+  \begin{align*}
+  H_{0}: \mu_T \leq \mu_C \qquad \text{vs.} \qquad H_{1}: \mu_T > \mu_C.
+  \end{align*}
+  Then, in nuisance parameter based sample size re-estimation in clinical trials with internal pilot study, the preplanned sample size of the clinical trial is adjusted mid-course using an estimated of variance $\sigma^2$ obtained with the results from the internal pilot study.
+  In the following the most common approaches for estimating the variance from the results of the interal pilot study are recapitulated.
+  A comprehensive comparision of the various methods was performed by Friede and Kieser (2013).
+  Let $n_1$ denote the sample size of the internal pilot study and let $n_{1T}$ and $n_{1C}$ be the group specific sample sizes within the internal pilot study.
+  
+## Unblinded sample size re-estimation
+
+  When the results of the internal pilot study are unblinded, that is when the treatment group indicator is revealed, the variance $\sigma^2$ can be estimated by the pooled sample variance, that is
+  \begin{align*}
+  \sigma_{1,pool}^{2} = \frac{1}{n_1-2}\sum_{i=T,C}\sum_{j=1}^{n_{1i}}\left(X_{ij} - \bar{X}_{i\cdot}\right)^2.
+  \end{align*}
+  Here, $\bar{X}_{i\cdot}$, $i=T,C$, denotes the group mean based on results of the internal pilot study.
+
+## Blinded sample size re-estimation
+
+  When the results of the internal pilot study are blinded, that is the treatment group is not known, it is recommended to estimate the variance $\sigma^2$ using the one-sample variance estimator which is the sample variance of the blinded data, i.e.
+  \begin{align*}
+  \sigma_{OS}^2 = \frac{1}{n_1 - 1} \sum_{i=1}^{n_1}\left(X_i - \bar{X}_{\cdot} \right)^2
+  \end{align*}
+  with $X_i$ a blinded observation from the internal pilot study and $\bar{X}_{\cdot}$ the overall mean of the observations from the internal pilot study.
+  Alternatively, in the case of a randomized block design, the variance can also be estimated using the Xing-Ganju variance estimator.
+  In a randomized black design, let the number of randomized blocks and the number of observations within each block be $b$ and $m$. 
+  The block sums are denoted by $T_{i}$, $i=1,\ldots, b$ and we define $S_{i}=T_{i}/\sqrt{m}$.
+  Then, the Xing-Ganju estimator is given by
+  \begin{align*}
+  \hat{\sigma}_{XG}^{2}=\frac{1}{b-1}\sum_{i=1}^{b}(S_{i} - \bar{S}_{\cdot})^2.
+  \end{align*}
+-->
+
+# Example
+ 
+ In this example it is illustrated how prior information can be integrated into the sample size re-estimation.
+ We assume that an MAP prior for the variance has been determined through a meta-analysis of the dataset `varianceHAMD` as presented in the other vignette of this package.
+ The MAP prior of the variance is mixture of two inverse Gamma distributions, i.e.
+ \begin{align*}
+ 0.194 \operatorname{InvGamma}(5.33, 167.55) +  0.806 \operatorname{InvGamma}(18.19, 691.14).
+ \end{align*}
+ The prior mean is $39.9$ and the prior median is $38.1$.
+ When prior information on the variance should be incorporated into the sample size re-estimation, the prior must be updated with the data from the internal pilot study. 
+ Thereto, it is sufficient to know the pooled sample variance $\hat{\sigma}_{1,pool}^{2}$.
+ To update the prior distribution for the variance, the R package `varmap` contains the function `update_var_prior`.
+ Its argments are the parameters of the prior distributin, the sample variance and the degrees of freedom.
+ Here, we assume a sample variance of $\hat{\sigma}_{1,pool}^{2}=35$ from an internal pilot study of $n_1=60$ which corresponds to $df=58$ degrees of freedom.
+ The next chunk shows the R code for updating the prior information.
+```{r}
+library(varmap)
+prior <- list(w = c(0.194, 0.806), shape = c(5.33, 18.19), rate = c(167.55, 691.14))
+posterior <- update_var_prior(prior = prior, sample_var = 35, degf = 58)
+posterior
+```
+The function `update_var_prior` returns the parameters of the posterior distribution.
+To re-estimate the sample size under consideration of the prior information, a Bayes estimator from the posterior distribution is determined and plugged into the sample size formula.
+Examples for the Bayes estimator are the posterior mean or the posterior median. The posterior mean is the mean of a mixture of inverse Gamma distribution, that is
+\begin{align*}
+\sum_{l=1}^{L}w_l \frac{b_l}{a_l-1}
+\end{align*}
+with $w_l$ the weight of the $l$-th mixture component and $a_l$ and $b_l$ the shape parameter and the rate parameter, respectively. 
+For the median of a mixture of inverse Gamma distribution, no closed form expression exist, but the numeric calculations can be performed with the function `qmixinvgamma`.
+The next snipped shows the calculation of the posterior mean and median.
+```{r}
+post_mean <- posterior$w %*% (posterior$rate / (posterior$shape - 1))
+post_median <- qmixinvgamma(p = 0.5, w = posterior$w, shape = posterior$shape,
+                            rate = posterior$rate)
+```
+Using the Bayes estimator, the sample size can now be re-estimated under consideration of prior information by plugging the Bayes estimator into the sample size formula above.
+  
+  
+# References
+* Friede T, Kieser M. [Blinded sample size re‐estimation in superiority and noninferiority trials: bias versus variance in variance estimation.](http://onlinelibrary.wiley.com/doi/10.1002/pst.1564/full) Pharmaceutical Statistics. 2013 12:141-146.
+* Mütze T, Schmidli H, Friede T. Nuisance parameter based sample size re-estimation incorporating prior information. Submitted. 2017.
