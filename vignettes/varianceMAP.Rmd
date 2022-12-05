@@ -99,7 +99,7 @@ vignette: >
 
   In the following we walk through an example about the MAP approach for variances.
   The R package `varmap` contains two datasets: `varianceHAMD` and `varianceSPB`. 
-  Both datasets were also discussed by Mütze et al. (2017).
+  Both datasets were also discussed by Mütze et al. (2018).
   Here, we focus on the dataset `varianceSPB` which contains the pooled sample variance and the respective degrees of freedom for twelve historical clinical trials.
   
   
@@ -123,7 +123,8 @@ knitr::kable(varianceSPB, caption = "Sample variance of historical clinical tria
   The next chunk lists a call of the `varmeta` function.
 
 ```{r, results = 'hide', echo = TRUE}
-out <- varmeta(sample_var = varianceHAMD$sample_var, degf = varianceHAMD$degf, mu_mean = 3, n.iter = 1000)
+set.seed(123456)
+out <- varmeta(sample_var = varianceSPB$sample_var, degf = varianceSPB$degf, mu_mean = 3, n.iter = 3000)
 ```
   
   The function `varmeta` returns an `mcmc.list` object with the MAP prior of the variance $\sigma^2_{new}$ stored under the name `map_variance`.
@@ -135,8 +136,7 @@ map_variance <- out[[1]][, "map_variance"]
 
 map_df <- data.frame(map = as.vector(map_variance))
 p <- ggplot(data = map_df, aes(x = map)) +
-  geom_histogram(aes(y = ..density..), binwidth = 4, colour="black", fill="white") +
-  xlim(c(0, 100)) +
+  geom_histogram(aes(y = ..density..), binwidth = 15, colour="black", fill="white") +
   xlab(expression(paste("Variance ", hat(sigma)[new]^{2}, " of new trial"))) +
   ylab("Density") +
   theme_bw() +
@@ -189,4 +189,4 @@ p + stat_function(fun = dmixinvgamma, args = fit_out[c("w", "shape", "rate")], s
 * Neuenschwander B, Capkun-Niggli G, Branson M, Spiegelhalter DJ. Summarizing historical information on controls in clinical trials. Clinical Trials. 2010 7:5-18.
 * Schmidli H, Gsteiger S, Roychoudhury S, O'Hagan A, Spiegelhalter D, Neuenschwander B. Robust meta‐analytic‐predictive priors in clinical trials with historical control information. Biometrics. 2014 70:1023-1032.
 * Schmidli H, Neuenschwander B, Friede T. [Meta-analytic-predictive use of historical variance data for the design and analysis of clinical trials](http://www.sciencedirect.com/science/article/pii/S0167947316301888). Computational Statistics & Data Analysis. 2016. 
-* Mütze T, Schmidli H, Friede T. Nuisance parameter based sample size re-estimation incorporating prior information. Submitted. 2017.
+* Mütze T, Schmidli H, Friede T. [Sample size re‐estimation incorporating prior information on a nuisance parameter](https://onlinelibrary.wiley.com/doi/full/10.1002/pst.1837). Pharmaceutical Statistics, 17(2), 126-143.

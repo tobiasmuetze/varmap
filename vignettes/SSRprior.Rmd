@@ -27,7 +27,7 @@ vignette: >
 
 ---
   
-  The package `varmap` provides functions for incorporating prior information into the nuisance parameter based sample size re-estimation in two-arm parallel group superiority trials as it has been discussed in detail by Mütze et al. (2017). 
+  The package `varmap` provides functions for incorporating prior information into the nuisance parameter based sample size re-estimation in two-arm parallel group superiority trials as it has been discussed in detail by Mütze et al. (2018). 
   This document provides a worked-out example for nuisance parameter based sample size re-estimation in the case of a normally distributed endpoint.
 
 ---
@@ -72,7 +72,7 @@ vignette: >
   \end{align*}
   Since the mixture of Gamma distributions is a conjugate prior for the precision, the posterior follows a mixture of Gamma distributions, too.
   To re-estimate the sample size under consideration of prior information, a Bayes estimator such as the posterior mean or the posterior median are plugged in to the sample size formula.
-  For more details, see Mütze et al. (2017).
+  For more details, see Mütze et al. (2018).
 
 <!--
 # Nuisance parameter based sample size re-estimation
@@ -118,22 +118,21 @@ vignette: >
 # Example
  
  In this example it is illustrated how prior information can be integrated into the sample size re-estimation.
- We assume that an MAP prior for the variance has been determined through a meta-analysis of the dataset `varianceHAMD` as presented in the other vignette of this package.
+ We assume that an MAP prior for the variance has been determined through a meta-analysis of the dataset `varianceSPB` as presented in the other vignette of this package.
  The MAP prior of the variance is mixture of two inverse Gamma distributions, i.e.
  \begin{align*}
- 0.194 \operatorname{InvGamma}(5.33, 167.55) +  0.806 \operatorname{InvGamma}(18.19, 691.14).
+ 0.27 \operatorname{InvGamma}(10.1, 2272.2) +  0.73 \operatorname{InvGamma}(34.48, 8419.3).
  \end{align*}
- The prior mean is $39.9$ and the prior median is $38.1$.
  When prior information on the variance should be incorporated into the sample size re-estimation, the prior must be updated with the data from the internal pilot study. 
  Thereto, it is sufficient to know the pooled sample variance $\hat{\sigma}_{1,pool}^{2}$.
  To update the prior distribution for the variance, the R package `varmap` contains the function `update_var_prior`.
- Its argments are the parameters of the prior distributin, the sample variance and the degrees of freedom.
- Here, we assume a sample variance of $\hat{\sigma}_{1,pool}^{2}=35$ from an internal pilot study of $n_1=60$ which corresponds to $df=58$ degrees of freedom.
+ It's arguments are the parameters of the prior distribution, the sample variance and the degrees of freedom.
+ Here, we assume a sample variance of $\hat{\sigma}_{1,pool}^{2}=200$ from an internal pilot study of $n_1=120$ which corresponds to $df=118$ degrees of freedom.
  The next chunk shows the R code for updating the prior information.
 ```{r}
 library(varmap)
-prior <- list(w = c(0.194, 0.806), shape = c(5.33, 18.19), rate = c(167.55, 691.14))
-posterior <- update_var_prior(prior = prior, sample_var = 35, degf = 58)
+prior <- list(w = c(0.27, 0.73), shape = c(10.1, 34.48), rate = c(2272.2, 8419.3))
+posterior <- update_var_prior(prior = prior, sample_var = 200, degf = 118)
 posterior
 ```
 The function `update_var_prior` returns the parameters of the posterior distribution.
@@ -155,4 +154,4 @@ Using the Bayes estimator, the sample size can now be re-estimated under conside
   
 # References
 * Friede T, Kieser M. [Blinded sample size re‐estimation in superiority and noninferiority trials: bias versus variance in variance estimation.](http://onlinelibrary.wiley.com/doi/10.1002/pst.1564/full) Pharmaceutical Statistics. 2013 12:141-146.
-* Mütze T, Schmidli H, Friede T. Nuisance parameter based sample size re-estimation incorporating prior information. Submitted. 2017.
+* Mütze T, Schmidli H, Friede T. [Sample size re‐estimation incorporating prior information on a nuisance parameter](https://onlinelibrary.wiley.com/doi/full/10.1002/pst.1837). Pharmaceutical Statistics, 17(2), 126-143.
